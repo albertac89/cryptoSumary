@@ -17,7 +17,7 @@ class CryptoSummaryListViewModel: ObservableObject {
         CryptoSummaryDataManager.getCoins()
             .map {
                 // Map [String: CoinResponse] to Coin
-                $0.data.values.map{ Coin(from: $0) }
+                $0.data.values.map { Coin(from: $0) }
             }
             .receive(on: RunLoop.main)
             .sink { response in
@@ -37,13 +37,17 @@ class CryptoSummaryListViewModel: ObservableObject {
 
 struct Coin: Identifiable {
     let id: String
-    let imageUrl: String?
+    let imageUrl: URL?
     let name: String
     let symbol: String
     
     init(from coin: CoinResponse) {
         self.id = coin.id
-        self.imageUrl = coin.imageUrl
+        if let imageUrl = coin.imageUrl {
+            self.imageUrl = URL(string: "https://www.cryptocompare.com\(imageUrl)")
+        } else {
+            self.imageUrl = nil
+        }
         self.name = coin.name
         self.symbol = coin.symbol
     }

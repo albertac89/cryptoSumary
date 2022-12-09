@@ -38,15 +38,7 @@ class CryptoSummaryDataManager {
             .decode(type: CryptoDataResponse.self, decoder: JSONDecoder())
             .eraseToAnyPublisher()
     }
-    
-    /*static func getCoinImage(url: URL) -> AnyPublisher<UIImage, Error> {
-        URLSession.shared
-            .dataTaskPublisher(for: url)
-            .map(\.data)
-            .compactMap { UIImage(data: $0) }
-            .mapError { $0 as Error }
-            .eraseToAnyPublisher()
-    }*/
+    //let url = URL(string: "https://www.cryptocompare.com\(imageUrl ?? "")")!
 }
 
 struct CryptoDataResponse: Codable {
@@ -66,7 +58,7 @@ struct CoinResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case id = "Id"
         case imageUrl = "ImageUrl"
-        case name = "Name"
+        case name = "CoinName"
         case symbol = "Symbol"
     }
 }

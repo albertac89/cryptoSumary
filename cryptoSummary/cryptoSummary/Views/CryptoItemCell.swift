@@ -12,9 +12,22 @@ struct CryptoItemCell: View {
     
     var body: some View {
         HStack {
-            Image(systemName: "square.and.arrow.up.circle")
+            AsyncImage(
+                url: cryptoItem.imageUrl,
+                content: { image in
+                    image.resizable()
+                         .aspectRatio(contentMode: .fit)
+                         .frame(maxWidth: 30, maxHeight: 30)
+                },
+                placeholder: {
+                    ProgressView()
+                }
+            )
             Text(cryptoItem.name)
+                .font(.system(size: 15))
             Text(cryptoItem.symbol)
+                .font(.system(size: 10))
+            Spacer()
             Text("0.00 €")
         }
     }
