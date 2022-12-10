@@ -12,30 +12,22 @@ struct CryptoItemCell: View {
     
     var body: some View {
         HStack {
-            AsyncImage(
-                url: cryptoItem.imageUrl,
-                content: { image in
-                    image.resizable()
-                         .aspectRatio(contentMode: .fit)
-                         .frame(maxWidth: 30, maxHeight: 30)
-                },
-                placeholder: {
-                    ProgressView()
-                }
-            )
+            Image(uiImage: cryptoItem.image)
+                .resizable()
+                .frame(maxWidth: 30, maxHeight: 30)
             Text(cryptoItem.name)
                 .font(.system(size: 15))
             Text(cryptoItem.symbol)
                 .font(.system(size: 10))
             Spacer()
-            Text("0.00 €")
+            Text("\(cryptoItem.value) €")
         }
     }
 }
 
 struct CryptoItemCell_Previews: PreviewProvider {
     static var previews: some View {
-        CryptoItemCell(cryptoItem: Coin(from: CoinResponse(id: "0", imageUrl: nil, name: "Bitcoin", symbol: "BTC")))
+        CryptoItemCell(cryptoItem: Coin(id: "0", image: UIImage(), name: "Bitcoin", symbol: "BTC", value: 10))
     }
 }
 

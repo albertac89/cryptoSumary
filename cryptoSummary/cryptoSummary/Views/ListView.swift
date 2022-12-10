@@ -11,9 +11,20 @@ struct ListView: View {
     @ObservedObject var viewModel = CryptoSummaryListViewModel()
     
     var body: some View {
-        List(viewModel.coins) { coin in
-            CryptoItemCell(cryptoItem: coin)
-        }.onAppear(perform: viewModel.fetchCoins)
+        if viewModel.isLoading {
+            ProgressView()
+                .scaleEffect(1.0, anchor: .center)
+                .progressViewStyle(CircularProgressViewStyle(tint: .red))
+        } else {
+            /*LazyVStack {
+                ForEach(viewModel.coins) { coin in
+                    CryptoItemCell(cryptoItem: coin)
+                }
+            }.onAppear(perform: viewModel.fetchCoins)*/
+            List(viewModel.coins) { coin in
+                CryptoItemCell(cryptoItem: coin)
+            }.onAppear(perform: viewModel.fetchCoins)
+        }
     }
 }
 

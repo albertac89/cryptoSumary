@@ -26,19 +26,37 @@ class CryptoSummaryDataManager {
         }
     }
 
-    //var cancellable = Set<AnyCancellable>()
-    //let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/all/coinlist")!
-    //let urlCoinValue = URL(string: "https://min-api.cryptocompare.com/data/price?fsym=\(coin)&tsyms=EUR")!
-    //https://www.cryptocompare.com/media/37747382/csc-2.png
-
-    static func getCoins() -> AnyPublisher<CryptoDataResponse, Error> {
+    static func getCoins() -> AnyPublisher<[CoinResponse], Error> {
         let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/all/coinlist")!
         return URLSession.shared.dataTaskPublisher(for: urlCoinList)
             .map(\.data)
             .decode(type: CryptoDataResponse.self, decoder: JSONDecoder())
+            .compactMap { $0.data.values.map { $0 } } // Map [String: CoinResponse] to CoinResponse
+            .share()
+            .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
-    //let url = URL(string: "https://www.cryptocompare.com\(imageUrl ?? "")")!
+
+    static func getCoinImage(for coin: CoinResponse) -> AnyPublisher<CoinImage, Error> {
+        let url = URL(string: "https://www.cryptocompare.com\(coin.imageUrl ?? "")")!
+        return URLSession.shared
+            .dataTaskPublisher(for: url)
+            .map(\.data)
+            .compactMap { CoinImage(id: coin.id, image: UIImage(data: $0)) }
+            .mapError { $0 as Error }
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+    }
+
+    static func getCoinEurValue(for coin: CoinResponse) -> AnyPublisher<CoinValue, Error> {
+        let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/price?fsym=\(coin.symbol)&tsyms=EUR")!
+        return URLSession.shared.dataTaskPublisher(for: urlCoinList)
+            .map(\.data)
+            .decode(type: CoinValueResponse.self, decoder: JSONDecoder())
+            .compactMap { CoinValue(id: coin.id, eur: $0.eur ?? 0.0)}
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+    }
 }
 
 struct CryptoDataResponse: Codable {
@@ -63,8 +81,18 @@ struct CoinResponse: Codable {
     }
 }
 
-struct CoinValueResponse: Codable {
+struct CoinImage {
+    let id: String
+    let image: UIImage?
+}
+
+struct CoinValue {
+    let id: String
     let eur: Float
+}
+
+struct CoinValueResponse: Codable {
+    let eur: Float?
     
     enum CodingKeys: String, CodingKey {
         case eur = "EUR"
