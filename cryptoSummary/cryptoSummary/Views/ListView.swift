@@ -16,14 +16,16 @@ struct ListView: View {
                 .scaleEffect(1.0, anchor: .center)
                 .progressViewStyle(CircularProgressViewStyle(tint: .red))
         } else {
-            /*LazyVStack {
-                ForEach(viewModel.coins) { coin in
-                    CryptoItemCell(cryptoItem: coin)
-                }
-            }.onAppear(perform: viewModel.fetchCoins)*/
-            List(viewModel.coins) { coin in
+            ScrollView {
+                LazyVStack {
+                    ForEach(viewModel.coins) { coin in
+                        CryptoItemCell(cryptoItem: coin)
+                    }
+                }.onAppear(perform: viewModel.fetchCoins)
+            }.padding()
+            /*List(viewModel.coins) { coin in
                 CryptoItemCell(cryptoItem: coin)
-            }.onAppear(perform: viewModel.fetchCoins)
+            }.onAppear(perform: viewModel.fetchCoins)*/
         }
     }
 }

@@ -26,12 +26,13 @@ class CryptoSummaryDataManager {
         }
     }
 
-    static func getCoins() -> AnyPublisher<[CoinResponse], Error> {
+    static func getCoins(from: Int, to: Int) -> AnyPublisher<[CoinResponse], Error> {
         let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/all/coinlist")!
         return URLSession.shared.dataTaskPublisher(for: urlCoinList)
             .map(\.data)
             .decode(type: CryptoDataResponse.self, decoder: JSONDecoder())
             .compactMap { $0.data.values.map { $0 } } // Map [String: CoinResponse] to CoinResponse
+            .map { $0[from...to].map { $0 } }
             .share()
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()

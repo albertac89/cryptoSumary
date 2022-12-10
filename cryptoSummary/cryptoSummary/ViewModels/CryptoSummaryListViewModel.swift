@@ -15,31 +15,13 @@ class CryptoSummaryListViewModel: ObservableObject {
     private var subscribers = Set<AnyCancellable>()
     
     func fetchCoins() {
-        isLoading = true
-        /*CryptoSummaryDataManager.getCoins()
-            .map {
-                // Map [String: CoinResponse] to Coin
-                $0.data.values.map { Coin(from: $0) }
-            }
-            .receive(on: RunLoop.main)
-            .sink { response in
-                switch response {
-                case .failure(let error):
-                    print("Failed with error: \(error)")
-                    return
-                case .finished:
-                    print("Succeesfully finished!")
-                }
-            } receiveValue: { coins in
-                self.coins = coins
-            }
-            .store(in: &subscribers)*/
-        
-        let coinsPublisher = CryptoSummaryDataManager.getCoins()
+        isLoading = false
+
+        let coinsPublisher = CryptoSummaryDataManager.getCoins(from: 0, to: 20)
         
         let imagesPublisher = coinsPublisher
             .flatMap { coins in
-                Publishers.Zip(Just(coins).setFailureType(to: Error.self),
+                return Publishers.Zip(Just(coins).setFailureType(to: Error.self),
                                Publishers.MergeMany(coins.map { CryptoSummaryDataManager.getCoinImage(for: $0) }).collect())
             }
             .map {
@@ -48,7 +30,7 @@ class CryptoSummaryListViewModel: ObservableObject {
         
         let coinEurValuePublisher = coinsPublisher
             .flatMap { coins in
-                Publishers.Zip(Just(coins).setFailureType(to: Error.self),
+                return Publishers.Zip(Just(coins).setFailureType(to: Error.self),
                                Publishers.MergeMany(coins.map { CryptoSummaryDataManager.getCoinEurValue(for: $0) }).collect())
             }
             .map {
@@ -56,7 +38,7 @@ class CryptoSummaryListViewModel: ObservableObject {
             }
         
         
-        Publishers.Zip(coinsPublisher, imagesPublisher) //coinEurValuePublisher
+        Publishers.Zip3(coinsPublisher, imagesPublisher, coinEurValuePublisher) //coinEurValuePublisher
             .sink { completion in
                 switch completion {
                 case .failure(let error):
@@ -65,13 +47,14 @@ class CryptoSummaryListViewModel: ObservableObject {
                 case .finished:
                     print("Succeesfully finished!")
                 }
-            } receiveValue: { [weak self] coinsResponse, imagesResponse in //coinValuesResponse
+            } receiveValue: { [weak self] coinsResponse, imagesResponse, coinValuesResponse in //coinValuesResponse
                 coinsResponse.forEach { [weak self] coinResponse in
                     let image = imagesResponse.first(where: { $0.id == coinResponse.id })
-                    //let coinValue = coinValuesResponse.first(where: { $0.id == coinResponse.id })
-                    self?.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: 0.0))//coinValue?.eur ??
+                    let coinValue = coinValuesResponse.first(where: { $0.id == coinResponse.id })
+                    self?.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: coinValue?.eur ?? 0.0))//coinValue?.eur ??
                 }
                 self?.isLoading = false
+                print("Loaded")
             }
             .store(in: &subscribers)
     }
