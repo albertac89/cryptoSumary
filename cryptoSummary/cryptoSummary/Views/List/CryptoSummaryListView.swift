@@ -26,7 +26,7 @@ struct CryptoSummaryListView: View {
                                 NavigationLink(destination: CryptoSummaryDetailView(viewModel: CryptoSummaryDetailViewModel(coin: coin))) {
                                     CryptoSummaryItemCell(cryptoItem: coin)
                                         .onAppear() {
-                                            if (viewModel.coins.last == coin) {
+                                            if viewModel.coins.last == coin {
                                                 if !viewModel.isLoadingEndScroll {
                                                     viewModel.fetchCoins()
                                                 }

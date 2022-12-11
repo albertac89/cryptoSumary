@@ -23,6 +23,9 @@
 		506C0F592945E90B005AB34C /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F582945E90B005AB34C /* LoaderView.swift */; };
 		506C0F5D2945EF09005AB34C /* CryptoSummaryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F5C2945EF09005AB34C /* CryptoSummaryDetailView.swift */; };
 		506C0F5F294612AB005AB34C /* CryptoSummaryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F5E294612AB005AB34C /* CryptoSummaryDetailViewModel.swift */; };
+		506C0F62294662C9005AB34C /* CoinImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F61294662C9005AB34C /* CoinImageDetailView.swift */; };
+		506C0F6429466342005AB34C /* CoinTextDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F6329466342005AB34C /* CoinTextDetailView.swift */; };
+		506C0F6629466440005AB34C /* CoinAmountEurDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F6529466440005AB34C /* CoinAmountEurDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +65,9 @@
 		506C0F582945E90B005AB34C /* LoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderView.swift; sourceTree = "<group>"; };
 		506C0F5C2945EF09005AB34C /* CryptoSummaryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryDetailView.swift; sourceTree = "<group>"; };
 		506C0F5E294612AB005AB34C /* CryptoSummaryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryDetailViewModel.swift; sourceTree = "<group>"; };
+		506C0F61294662C9005AB34C /* CoinImageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinImageDetailView.swift; sourceTree = "<group>"; };
+		506C0F6329466342005AB34C /* CoinTextDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinTextDetailView.swift; sourceTree = "<group>"; };
+		506C0F6529466440005AB34C /* CoinAmountEurDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinAmountEurDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,10 +158,10 @@
 		50000C4829436E9900B49F76 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				506C0F602946629F005AB34C /* Components */,
 				506C0F5B2945EEF2005AB34C /* Detail */,
 				506C0F5A2945EEE1005AB34C /* List */,
 				50000C1B29436E1A00B49F76 /* ContentView.swift */,
-				506C0F582945E90B005AB34C /* LoaderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -192,6 +198,17 @@
 				506C0F5C2945EF09005AB34C /* CryptoSummaryDetailView.swift */,
 			);
 			path = Detail;
+			sourceTree = "<group>";
+		};
+		506C0F602946629F005AB34C /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				506C0F582945E90B005AB34C /* LoaderView.swift */,
+				506C0F61294662C9005AB34C /* CoinImageDetailView.swift */,
+				506C0F6329466342005AB34C /* CoinTextDetailView.swift */,
+				506C0F6529466440005AB34C /* CoinAmountEurDetailView.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -326,11 +343,14 @@
 			files = (
 				50000C2329436E1B00B49F76 /* Persistence.swift in Sources */,
 				50000C2629436E1B00B49F76 /* cryptoSummary.xcdatamodeld in Sources */,
+				506C0F6429466342005AB34C /* CoinTextDetailView.swift in Sources */,
 				50000C552943724500B49F76 /* CryptoSummaryItemCell.swift in Sources */,
 				506C0F5D2945EF09005AB34C /* CryptoSummaryDetailView.swift in Sources */,
 				50000C532943711900B49F76 /* CryptoSummaryListView.swift in Sources */,
 				50000C592943856C00B49F76 /* CryptoSummaryListViewModel.swift in Sources */,
+				506C0F62294662C9005AB34C /* CoinImageDetailView.swift in Sources */,
 				50000C1C29436E1A00B49F76 /* ContentView.swift in Sources */,
+				506C0F6629466440005AB34C /* CoinAmountEurDetailView.swift in Sources */,
 				50000C1A29436E1A00B49F76 /* cryptoSummaryApp.swift in Sources */,
 				506C0F5F294612AB005AB34C /* CryptoSummaryDetailViewModel.swift in Sources */,
 				50000C5729437A6100B49F76 /* CryptoSummaryDataManager.swift in Sources */,
