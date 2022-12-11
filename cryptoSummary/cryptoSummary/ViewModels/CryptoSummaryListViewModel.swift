@@ -8,37 +8,31 @@
 import SwiftUI
 import Combine
 
+protocol CryptoSummaryListViewModelProtocol {
+    func fetchCoins()
+}
+
 class CryptoSummaryListViewModel: ObservableObject {
     @Published var coins = [Coin]()
     @Published var isLoading = false
     
     private var subscribers = Set<AnyCancellable>()
+    private var dataManager: CryptoSummaryDataManagerProtocol
     
-    func fetchCoins() {
-        isLoading = false
+    init(dataManager: CryptoSummaryDataManagerProtocol) {
+        self.dataManager = dataManager
+    }
+}
 
-        let coinsPublisher = CryptoSummaryDataManager.getCoins(from: 0, to: 20)
+extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
+    func fetchCoins() {
+        isLoading = true
+
+        let coinsPublisher = dataManager.getCoins(from: 0, to: 20)//depenen del scroll es poden obtenir mes monedes, mirant la cuantitat que hi ha a coins i sumant 20 mes
+        let imagesPublisher = dataManager.imagesPublisher(coinsPublisher: coinsPublisher)
+        let coinEurValuePublisher = dataManager.coinEurValuePublisher(coinsPublisher: coinsPublisher)
         
-        let imagesPublisher = coinsPublisher
-            .flatMap { coins in
-                return Publishers.Zip(Just(coins).setFailureType(to: Error.self),
-                               Publishers.MergeMany(coins.map { CryptoSummaryDataManager.getCoinImage(for: $0) }).collect())
-            }
-            .map {
-                return $0.1
-            }
-        
-        let coinEurValuePublisher = coinsPublisher
-            .flatMap { coins in
-                return Publishers.Zip(Just(coins).setFailureType(to: Error.self),
-                               Publishers.MergeMany(coins.map { CryptoSummaryDataManager.getCoinEurValue(for: $0) }).collect())
-            }
-            .map {
-                return $0.1
-            }
-        
-        
-        Publishers.Zip3(coinsPublisher, imagesPublisher, coinEurValuePublisher) //coinEurValuePublisher
+        Publishers.Zip3(coinsPublisher, imagesPublisher, coinEurValuePublisher)
             .sink { completion in
                 switch completion {
                 case .failure(let error):
@@ -47,17 +41,23 @@ class CryptoSummaryListViewModel: ObservableObject {
                 case .finished:
                     print("Succeesfully finished!")
                 }
-            } receiveValue: { [weak self] coinsResponse, imagesResponse, coinValuesResponse in //coinValuesResponse
-                coinsResponse.forEach { [weak self] coinResponse in
+            } receiveValue: { [weak self] coinsResponse, imagesResponse, coinValuesResponse in
+                coinsResponse.enumerated().forEach { [weak self] index, coinResponse in
+                    // todo move to a func
                     let image = imagesResponse.first(where: { $0.id == coinResponse.id })
                     let coinValue = coinValuesResponse.first(where: { $0.id == coinResponse.id })
-                    self?.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: coinValue?.eur ?? 0.0))//coinValue?.eur ??
+                    self?.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: coinValue?.eur ?? 0.0))
+                    if coinsResponse.count - 1 == index {
+                        self?.isLoading = false
+                    }
                 }
-                self?.isLoading = false
-                print("Loaded")
             }
             .store(in: &subscribers)
     }
+}
+
+private extension CryptoSummaryListViewModel {
+    
 }
 
 struct Coin: Identifiable {

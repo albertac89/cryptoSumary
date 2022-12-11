@@ -8,6 +8,12 @@
 import Combine
 import UIKit
 
+protocol CryptoSummaryDataManagerProtocol {
+    func getCoins(from: Int, to: Int) -> AnyPublisher<[CoinResponse], Error>
+    func imagesPublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>.Output>
+    func coinEurValuePublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>.Output>
+}
+
 class CryptoSummaryDataManager {
     enum CryptoSummaryError: Error, CustomStringConvertible {
         case network
@@ -25,8 +31,10 @@ class CryptoSummaryDataManager {
             }
         }
     }
+}
 
-    static func getCoins(from: Int, to: Int) -> AnyPublisher<[CoinResponse], Error> {
+extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
+    func getCoins(from: Int, to: Int) -> AnyPublisher<[CoinResponse], Error> {
         let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/all/coinlist")!
         return URLSession.shared.dataTaskPublisher(for: urlCoinList)
             .map(\.data)
@@ -37,8 +45,32 @@ class CryptoSummaryDataManager {
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
+    
+    func imagesPublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>.Output> {
+        return coinsPublisher
+            .flatMap { coins in
+                return Publishers.Zip(Just(coins).setFailureType(to: Error.self),
+                                      Publishers.MergeMany(coins.map { self.getCoinImage(for: $0) }).collect())
+            }
+            .map {
+                return $0.1
+            }
+    }
+    
+    func coinEurValuePublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>.Output> {
+        return coinsPublisher
+            .flatMap { coins in
+                return Publishers.Zip(Just(coins).setFailureType(to: Error.self),
+                                      Publishers.MergeMany(coins.map { self.getCoinEurValue(for: $0) }).collect())
+            }
+            .map {
+                return $0.1
+            }
+    }
+}
 
-    static func getCoinImage(for coin: CoinResponse) -> AnyPublisher<CoinImage, Error> {
+private extension CryptoSummaryDataManager {
+    func getCoinImage(for coin: CoinResponse) -> AnyPublisher<CoinImage, Error> {
         let url = URL(string: "https://www.cryptocompare.com\(coin.imageUrl ?? "")")!
         return URLSession.shared
             .dataTaskPublisher(for: url)
@@ -48,8 +80,8 @@ class CryptoSummaryDataManager {
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
-
-    static func getCoinEurValue(for coin: CoinResponse) -> AnyPublisher<CoinValue, Error> {
+    
+    func getCoinEurValue(for coin: CoinResponse) -> AnyPublisher<CoinValue, Error> {
         let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/price?fsym=\(coin.symbol)&tsyms=EUR")!
         return URLSession.shared.dataTaskPublisher(for: urlCoinList)
             .map(\.data)

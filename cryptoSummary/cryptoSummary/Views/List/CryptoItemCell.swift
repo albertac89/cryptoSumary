@@ -20,8 +20,9 @@ struct CryptoItemCell: View {
             Text(cryptoItem.symbol)
                 .font(.system(size: 10))
             Spacer()
-            Text("\(cryptoItem.value) €")
-        }
+            Text("\(cryptoItem.value)€")
+                .font(.system(size: 12))
+        }.shadow(color: Color.gray, radius: 1)
     }
 }
 
@@ -30,5 +31,3 @@ struct CryptoItemCell_Previews: PreviewProvider {
         CryptoItemCell(cryptoItem: Coin(id: "0", image: UIImage(), name: "Bitcoin", symbol: "BTC", value: 10))
     }
 }
-
-//name, logo, symbol and value (€(EUR) conversion)

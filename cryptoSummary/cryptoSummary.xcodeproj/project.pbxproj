@@ -20,6 +20,8 @@
 		50000C552943724500B49F76 /* CryptoItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C542943724500B49F76 /* CryptoItemCell.swift */; };
 		50000C5729437A6100B49F76 /* CryptoSummaryDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C5629437A6100B49F76 /* CryptoSummaryDataManager.swift */; };
 		50000C592943856C00B49F76 /* CryptoSummaryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C582943856C00B49F76 /* CryptoSummaryListViewModel.swift */; };
+		506C0F592945E90B005AB34C /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F582945E90B005AB34C /* LoaderView.swift */; };
+		506C0F5D2945EF09005AB34C /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F5C2945EF09005AB34C /* DetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +58,8 @@
 		50000C542943724500B49F76 /* CryptoItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoItemCell.swift; sourceTree = "<group>"; };
 		50000C5629437A6100B49F76 /* CryptoSummaryDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryDataManager.swift; sourceTree = "<group>"; };
 		50000C582943856C00B49F76 /* CryptoSummaryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryListViewModel.swift; sourceTree = "<group>"; };
+		506C0F582945E90B005AB34C /* LoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderView.swift; sourceTree = "<group>"; };
+		506C0F5C2945EF09005AB34C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,9 +150,10 @@
 		50000C4829436E9900B49F76 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				506C0F5B2945EEF2005AB34C /* Detail */,
+				506C0F5A2945EEE1005AB34C /* List */,
 				50000C1B29436E1A00B49F76 /* ContentView.swift */,
-				50000C522943711900B49F76 /* ListView.swift */,
-				50000C542943724500B49F76 /* CryptoItemCell.swift */,
+				506C0F582945E90B005AB34C /* LoaderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -167,6 +172,23 @@
 				50000C582943856C00B49F76 /* CryptoSummaryListViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		506C0F5A2945EEE1005AB34C /* List */ = {
+			isa = PBXGroup;
+			children = (
+				50000C522943711900B49F76 /* ListView.swift */,
+				50000C542943724500B49F76 /* CryptoItemCell.swift */,
+			);
+			path = List;
+			sourceTree = "<group>";
+		};
+		506C0F5B2945EEF2005AB34C /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				506C0F5C2945EF09005AB34C /* DetailView.swift */,
+			);
+			path = Detail;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -302,11 +324,13 @@
 				50000C2329436E1B00B49F76 /* Persistence.swift in Sources */,
 				50000C2629436E1B00B49F76 /* cryptoSummary.xcdatamodeld in Sources */,
 				50000C552943724500B49F76 /* CryptoItemCell.swift in Sources */,
+				506C0F5D2945EF09005AB34C /* DetailView.swift in Sources */,
 				50000C532943711900B49F76 /* ListView.swift in Sources */,
 				50000C592943856C00B49F76 /* CryptoSummaryListViewModel.swift in Sources */,
 				50000C1C29436E1A00B49F76 /* ContentView.swift in Sources */,
 				50000C1A29436E1A00B49F76 /* cryptoSummaryApp.swift in Sources */,
 				50000C5729437A6100B49F76 /* CryptoSummaryDataManager.swift in Sources */,
+				506C0F592945E90B005AB34C /* LoaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
