@@ -13,7 +13,7 @@ struct cryptoSummaryApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ListView()
+            CryptoSummaryListView(viewModel: CryptoSummaryListViewModel(dataManager: CryptoSummaryDataManager()))
         }
     }
 }

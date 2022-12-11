@@ -16,12 +16,13 @@
 		50000C3029436E1B00B49F76 /* cryptoSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C2F29436E1B00B49F76 /* cryptoSummaryTests.swift */; };
 		50000C3A29436E1C00B49F76 /* cryptoSummaryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C3929436E1C00B49F76 /* cryptoSummaryUITests.swift */; };
 		50000C3C29436E1C00B49F76 /* cryptoSummaryUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C3B29436E1C00B49F76 /* cryptoSummaryUITestsLaunchTests.swift */; };
-		50000C532943711900B49F76 /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C522943711900B49F76 /* ListView.swift */; };
-		50000C552943724500B49F76 /* CryptoItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C542943724500B49F76 /* CryptoItemCell.swift */; };
+		50000C532943711900B49F76 /* CryptoSummaryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C522943711900B49F76 /* CryptoSummaryListView.swift */; };
+		50000C552943724500B49F76 /* CryptoSummaryItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C542943724500B49F76 /* CryptoSummaryItemCell.swift */; };
 		50000C5729437A6100B49F76 /* CryptoSummaryDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C5629437A6100B49F76 /* CryptoSummaryDataManager.swift */; };
 		50000C592943856C00B49F76 /* CryptoSummaryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50000C582943856C00B49F76 /* CryptoSummaryListViewModel.swift */; };
 		506C0F592945E90B005AB34C /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F582945E90B005AB34C /* LoaderView.swift */; };
-		506C0F5D2945EF09005AB34C /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F5C2945EF09005AB34C /* DetailView.swift */; };
+		506C0F5D2945EF09005AB34C /* CryptoSummaryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F5C2945EF09005AB34C /* CryptoSummaryDetailView.swift */; };
+		506C0F5F294612AB005AB34C /* CryptoSummaryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506C0F5E294612AB005AB34C /* CryptoSummaryDetailViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,12 +55,13 @@
 		50000C3529436E1C00B49F76 /* cryptoSummaryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cryptoSummaryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50000C3929436E1C00B49F76 /* cryptoSummaryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cryptoSummaryUITests.swift; sourceTree = "<group>"; };
 		50000C3B29436E1C00B49F76 /* cryptoSummaryUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cryptoSummaryUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		50000C522943711900B49F76 /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
-		50000C542943724500B49F76 /* CryptoItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoItemCell.swift; sourceTree = "<group>"; };
+		50000C522943711900B49F76 /* CryptoSummaryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryListView.swift; sourceTree = "<group>"; };
+		50000C542943724500B49F76 /* CryptoSummaryItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryItemCell.swift; sourceTree = "<group>"; };
 		50000C5629437A6100B49F76 /* CryptoSummaryDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryDataManager.swift; sourceTree = "<group>"; };
 		50000C582943856C00B49F76 /* CryptoSummaryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryListViewModel.swift; sourceTree = "<group>"; };
 		506C0F582945E90B005AB34C /* LoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderView.swift; sourceTree = "<group>"; };
-		506C0F5C2945EF09005AB34C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		506C0F5C2945EF09005AB34C /* CryptoSummaryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryDetailView.swift; sourceTree = "<group>"; };
+		506C0F5E294612AB005AB34C /* CryptoSummaryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSummaryDetailViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				50000C582943856C00B49F76 /* CryptoSummaryListViewModel.swift */,
+				506C0F5E294612AB005AB34C /* CryptoSummaryDetailViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -177,8 +180,8 @@
 		506C0F5A2945EEE1005AB34C /* List */ = {
 			isa = PBXGroup;
 			children = (
-				50000C522943711900B49F76 /* ListView.swift */,
-				50000C542943724500B49F76 /* CryptoItemCell.swift */,
+				50000C522943711900B49F76 /* CryptoSummaryListView.swift */,
+				50000C542943724500B49F76 /* CryptoSummaryItemCell.swift */,
 			);
 			path = List;
 			sourceTree = "<group>";
@@ -186,7 +189,7 @@
 		506C0F5B2945EEF2005AB34C /* Detail */ = {
 			isa = PBXGroup;
 			children = (
-				506C0F5C2945EF09005AB34C /* DetailView.swift */,
+				506C0F5C2945EF09005AB34C /* CryptoSummaryDetailView.swift */,
 			);
 			path = Detail;
 			sourceTree = "<group>";
@@ -323,12 +326,13 @@
 			files = (
 				50000C2329436E1B00B49F76 /* Persistence.swift in Sources */,
 				50000C2629436E1B00B49F76 /* cryptoSummary.xcdatamodeld in Sources */,
-				50000C552943724500B49F76 /* CryptoItemCell.swift in Sources */,
-				506C0F5D2945EF09005AB34C /* DetailView.swift in Sources */,
-				50000C532943711900B49F76 /* ListView.swift in Sources */,
+				50000C552943724500B49F76 /* CryptoSummaryItemCell.swift in Sources */,
+				506C0F5D2945EF09005AB34C /* CryptoSummaryDetailView.swift in Sources */,
+				50000C532943711900B49F76 /* CryptoSummaryListView.swift in Sources */,
 				50000C592943856C00B49F76 /* CryptoSummaryListViewModel.swift in Sources */,
 				50000C1C29436E1A00B49F76 /* ContentView.swift in Sources */,
 				50000C1A29436E1A00B49F76 /* cryptoSummaryApp.swift in Sources */,
+				506C0F5F294612AB005AB34C /* CryptoSummaryDetailViewModel.swift in Sources */,
 				50000C5729437A6100B49F76 /* CryptoSummaryDataManager.swift in Sources */,
 				506C0F592945E90B005AB34C /* LoaderView.swift in Sources */,
 			);
