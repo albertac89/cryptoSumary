@@ -7,11 +7,14 @@
 
 import Combine
 import UIKit
+import CoreData
 
 protocol CryptoSummaryDataManagerProtocol {
     func getCoins(from: Int, to: Int) -> AnyPublisher<[CoinResponse], Error>
     func imagesPublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>.Output>
     func coinEurValuePublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>.Output>
+    func saveCoinsToCoreData(coins: [Coin])
+    func loadCoinsFromCoreData() -> [Coin]?
 }
 
 class CryptoSummaryDataManager {
@@ -31,6 +34,16 @@ class CryptoSummaryDataManager {
             }
         }
     }
+    
+    private lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "cryptoSummary")
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return container
+    }()
 }
 
 extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
@@ -67,6 +80,46 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
                 return $0.1
             }
     }
+    
+    func saveCoinsToCoreData(coins: [Coin]) {
+        clearCoreDataCoinsEntity()
+        coins.forEach { coin in
+            if let entity = NSEntityDescription.entity(forEntityName: "Coins", in: persistentContainer.viewContext) {
+                let coinData = NSManagedObject(entity: entity, insertInto: persistentContainer.viewContext)
+                coinData.setValue(coin.id, forKeyPath: "id")
+                coinData.setValue(coin.name, forKeyPath: "name")
+                coinData.setValue(coin.symbol, forKeyPath: "symbol")
+                coinData.setValue(coin.image.pngData(), forKeyPath: "image")
+                coinData.setValue(coin.value, forKeyPath: "value")
+            }
+        }
+        
+        do {
+            try persistentContainer.viewContext.save()
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
+    
+    func loadCoinsFromCoreData() -> [Coin]? {
+        var coins: [NSManagedObject] = []
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Coins")
+        
+        do {
+            coins = try persistentContainer.viewContext.fetch(fetchRequest)
+            return coins.map {
+                let id = $0.value(forKey: "id") as? String ?? ""
+                let image = UIImage(data: $0.value(forKey: "image") as? Data ?? Data()) ?? UIImage()
+                let name = $0.value(forKey: "name") as? String ?? ""
+                let symbol = $0.value(forKey: "symbol") as? String ?? ""
+                let value = $0.value(forKey: "value") as? Float ?? 0
+                return Coin(id: id, image: image, name: name, symbol: symbol, value: value)
+            }
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+            return nil
+        }
+    }
 }
 
 private extension CryptoSummaryDataManager {
@@ -90,44 +143,16 @@ private extension CryptoSummaryDataManager {
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
-}
-
-struct CryptoDataResponse: Codable {
-    let data: [String: CoinResponse]
     
-    enum CodingKeys: String, CodingKey {
-        case data = "Data"
-    }
-}
-
-struct CoinResponse: Codable {
-    let id: String
-    let imageUrl: String?
-    let name: String
-    let symbol: String
-    
-    enum CodingKeys: String, CodingKey {
-        case id = "Id"
-        case imageUrl = "ImageUrl"
-        case name = "CoinName"
-        case symbol = "Symbol"
-    }
-}
-
-struct CoinImage {
-    let id: String
-    let image: UIImage?
-}
-
-struct CoinValue {
-    let id: String
-    let eur: Float
-}
-
-struct CoinValueResponse: Codable {
-    let eur: Float?
-    
-    enum CodingKeys: String, CodingKey {
-        case eur = "EUR"
+    func clearCoreDataCoinsEntity() {
+        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Coins")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
+        
+        do {
+            try persistentContainer.viewContext.execute(deleteRequest)
+            try persistentContainer.viewContext.save()
+        } catch let error as NSError {
+            print("There was an error deleting data. \(error), \(error.userInfo)")
+        }
     }
 }

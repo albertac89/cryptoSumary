@@ -19,14 +19,22 @@ class CryptoSummaryListViewModel: ObservableObject {
     
     private var subscribers = Set<AnyCancellable>()
     private var dataManager: CryptoSummaryDataManagerProtocol
+    private var networkMonitor: NetworkMonitorProtocol
     
-    init(dataManager: CryptoSummaryDataManagerProtocol) {
+    init(dataManager: CryptoSummaryDataManagerProtocol, networkMonitor: NetworkMonitorProtocol) {
         self.dataManager = dataManager
+        self.networkMonitor = networkMonitor
     }
 }
 
 extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
     func fetchCoins() {
+        if !networkMonitor.isNetworkAvailable {
+            if let coinsCoreData = dataManager.loadCoinsFromCoreData() {
+                coins = coinsCoreData
+                return
+            }
+        }
         var from = 0
         var to = 20
         isLoading = true
@@ -57,6 +65,10 @@ extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
             }
             .store(in: &subscribers)
     }
+    
+    func isNetworkAvailable() -> Bool {
+        networkMonitor.isNetworkAvailable
+    }
 }
 
 private extension CryptoSummaryListViewModel {
@@ -68,13 +80,6 @@ private extension CryptoSummaryListViewModel {
                 self.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: coinValue?.eur ?? 0.0))
             }
         }
+        dataManager.saveCoinsToCoreData(coins: self.coins)
     }
-}
-
-struct Coin: Identifiable, Equatable {
-    let id: String
-    let image: UIImage
-    let name: String
-    let symbol: String
-    let value: Float
 }

@@ -19,7 +19,7 @@ struct CryptoSummaryDetailView: View {
             VStack(alignment: .center) {
                 CoinImageDetailView(image: viewModel.coin.image)
                 CoinTextDetailView(text: "Symbol: ", value: viewModel.coin.symbol)
-                CoinTextDetailView(text: "Value: ", value: "\(viewModel.coin.value)")
+                CoinTextDetailView(text: "Value: ", value: "\(viewModel.coin.value)€")
                 CoinTextDetailView(text: "Volume over 24h: ", value: "654632.154€")
             }
             Divider().padding(EdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0))

@@ -27,7 +27,7 @@ struct CryptoSummaryListView: View {
                                     CryptoSummaryItemCell(cryptoItem: coin)
                                         .onAppear() {
                                             if viewModel.coins.last == coin {
-                                                if !viewModel.isLoadingEndScroll {
+                                                if !viewModel.isLoadingEndScroll && viewModel.isNetworkAvailable() {
                                                     viewModel.fetchCoins()
                                                 }
                                             }
@@ -49,6 +49,6 @@ struct CryptoSummaryListView: View {
 
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
-        CryptoSummaryListView(viewModel: CryptoSummaryListViewModel(dataManager: CryptoSummaryDataManager()))
+        CryptoSummaryListView(viewModel: CryptoSummaryListViewModel(dataManager: CryptoSummaryDataManager(), networkMonitor: NetworkMonitor()))
     }
 }
