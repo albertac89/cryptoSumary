@@ -22,6 +22,6 @@ class CryptoSummaryDetailViewModel: ObservableObject {
 
 extension CryptoSummaryDetailViewModel: CryptoSummaryDetailViewModelProtocol {
     func coinsForAmount() -> Float {
-        return (eurValue as NSString).floatValue * coin.value
+        return (eurValue as NSString).floatValue * (coin.value as NSString).floatValue
     }
 }

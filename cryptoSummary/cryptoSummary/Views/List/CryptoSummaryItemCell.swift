@@ -21,7 +21,7 @@ struct CryptoSummaryItemCell: View {
                 Text(cryptoItem.symbol)
                     .font(.system(size: 10))
                 Spacer()
-                Text("\(cryptoItem.value)€")
+                Text(cryptoItem.value)
                     .font(.system(size: 12))
                 Image(systemName: "chevron.right")
             }

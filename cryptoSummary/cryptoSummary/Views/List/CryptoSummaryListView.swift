@@ -22,11 +22,11 @@ struct CryptoSummaryListView: View {
                 NavigationView {
                     ScrollView {
                         LazyVStack {
-                            ForEach(viewModel.coins) { coin in
+                            ForEach(viewModel.coinsList) { coin in
                                 NavigationLink(destination: CryptoSummaryDetailView(viewModel: CryptoSummaryDetailViewModel(coin: coin))) {
                                     CryptoSummaryItemCell(cryptoItem: coin)
                                         .onAppear() {
-                                            if viewModel.coins.last == coin {
+                                            if viewModel.coinsList.last == coin {
                                                 if !viewModel.isLoadingEndScroll && viewModel.isNetworkAvailable() {
                                                     viewModel.fetchCoins()
                                                 }

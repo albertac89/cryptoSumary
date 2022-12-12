@@ -73,6 +73,15 @@ struct Coin: Identifiable, Equatable {
     let image: UIImage
     let name: String
     let symbol: String
-    let value: Float
-    let vol24: Float
+    let value: String
+    let vol24: String
+    
+    init(id: String, image: UIImage, name: String, symbol: String, value: Float, vol24: Float) {
+        self.id = id
+        self.image = image
+        self.name = name
+        self.symbol = symbol
+        self.value = value == .zero ? "No data available" : "\(value)€"
+        self.vol24 = vol24 == .zero ? "No data available" : "\(vol24)€"
+    }
 }

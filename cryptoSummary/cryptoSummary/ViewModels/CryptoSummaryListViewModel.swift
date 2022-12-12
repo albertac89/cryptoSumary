@@ -13,7 +13,7 @@ protocol CryptoSummaryListViewModelProtocol {
 }
 
 class CryptoSummaryListViewModel: ObservableObject {
-    @Published var coins = [Coin]()
+    @Published var coinsList = [Coin]()
     @Published var isLoading = false
     @Published var isLoadingEndScroll = false
     
@@ -31,14 +31,14 @@ extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
     func fetchCoins() {
         if !networkMonitor.isNetworkAvailable {
             if let coinsCoreData = dataManager.loadCoinsFromCoreData() {
-                coins = coinsCoreData
+                coinsList = coinsCoreData
                 return
             }
         }
         var from = 0
         var to = 20
         isLoading = true
-        if coins.count > 0 {
+        if coinsList.count > 0 {
             from = to
             to += to
             isLoading = false
@@ -59,29 +59,15 @@ extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
                 case .finished:
                     print("Succeesfully finished!")
                 }
-            } receiveValue: { [weak self] coinsResponse, imagesResponse, coinValuesResponse, coin24HourVolume in
-                self?.mergeCoinsData(coinsResponse: coinsResponse, imagesResponse: imagesResponse, coinValuesResponse: coinValuesResponse, coin24HourVolume: coin24HourVolume)
-                self?.isLoading = false
-                self?.isLoadingEndScroll = false
+            } receiveValue: { coinsResponse, imagesResponse, coinValuesResponse, coin24HourVolume in
+                self.dataManager.mergeCoinsData(coinsList: &self.coinsList, coinsResponse: coinsResponse, imagesResponse: imagesResponse, coinValuesResponse: coinValuesResponse, coin24HourVolume: coin24HourVolume)
+                self.isLoading = false
+                self.isLoadingEndScroll = false
             }
             .store(in: &subscribers)
     }
     
     func isNetworkAvailable() -> Bool {
         networkMonitor.isNetworkAvailable
-    }
-}
-
-private extension CryptoSummaryListViewModel {
-    func mergeCoinsData(coinsResponse: [CoinResponse], imagesResponse: [CoinImage], coinValuesResponse: [CoinValue], coin24HourVolume: [Coin24HourlVolume]) {
-        coinsResponse.enumerated().forEach { index, coinResponse in
-            if !self.coins.contains(where: { $0.id == coinResponse.id }) {
-                let image = imagesResponse.first(where: { $0.id == coinResponse.id })
-                let coinValue = coinValuesResponse.first(where: { $0.id == coinResponse.id })
-                let coinVol = coin24HourVolume.first(where: { $0.id == coinResponse.id })
-                self.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: coinValue?.eur ?? 0.0, vol24: coinVol?.volume24Hour ?? 0.0))
-            }
-        }
-        dataManager.saveCoinsToCoreData(coins: self.coins)
     }
 }
