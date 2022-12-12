@@ -48,8 +48,9 @@ extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
         let coinsPublisher = dataManager.getCoins(from: from, to: to)
         let imagesPublisher = dataManager.imagesPublisher(coinsPublisher: coinsPublisher)
         let coinEurValuePublisher = dataManager.coinEurValuePublisher(coinsPublisher: coinsPublisher)
+        let coin24HourVolume = dataManager.coin24HourVolumePublisher(coinsPublisher: coinsPublisher)
         
-        Publishers.Zip3(coinsPublisher, imagesPublisher, coinEurValuePublisher)
+        Publishers.Zip4(coinsPublisher, imagesPublisher, coinEurValuePublisher, coin24HourVolume)
             .sink { completion in
                 switch completion {
                 case .failure(let error):
@@ -58,8 +59,8 @@ extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
                 case .finished:
                     print("Succeesfully finished!")
                 }
-            } receiveValue: { [weak self] coinsResponse, imagesResponse, coinValuesResponse in
-                self?.mergeCoinsData(coinsResponse: coinsResponse, imagesResponse: imagesResponse, coinValuesResponse: coinValuesResponse)
+            } receiveValue: { [weak self] coinsResponse, imagesResponse, coinValuesResponse, coin24HourVolume in
+                self?.mergeCoinsData(coinsResponse: coinsResponse, imagesResponse: imagesResponse, coinValuesResponse: coinValuesResponse, coin24HourVolume: coin24HourVolume)
                 self?.isLoading = false
                 self?.isLoadingEndScroll = false
             }
@@ -72,12 +73,13 @@ extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
 }
 
 private extension CryptoSummaryListViewModel {
-    func mergeCoinsData(coinsResponse: [CoinResponse], imagesResponse: [CoinImage], coinValuesResponse: [CoinValue]) {
+    func mergeCoinsData(coinsResponse: [CoinResponse], imagesResponse: [CoinImage], coinValuesResponse: [CoinValue], coin24HourVolume: [Coin24HourlVolume]) {
         coinsResponse.enumerated().forEach { index, coinResponse in
             if !self.coins.contains(where: { $0.id == coinResponse.id }) {
                 let image = imagesResponse.first(where: { $0.id == coinResponse.id })
                 let coinValue = coinValuesResponse.first(where: { $0.id == coinResponse.id })
-                self.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: coinValue?.eur ?? 0.0))
+                let coinVol = coin24HourVolume.first(where: { $0.id == coinResponse.id })
+                self.coins.append(Coin(id: coinResponse.id, image: image?.image ?? UIImage(), name: coinResponse.name, symbol: coinResponse.symbol, value: coinValue?.eur ?? 0.0, vol24: coinVol?.volume24Hour ?? 0.0))
             }
         }
         dataManager.saveCoinsToCoreData(coins: self.coins)

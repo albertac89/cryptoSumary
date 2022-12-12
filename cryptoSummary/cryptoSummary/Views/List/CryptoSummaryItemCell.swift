@@ -35,6 +35,6 @@ struct CryptoSummaryItemCell: View {
 
 struct CryptoItemCell_Previews: PreviewProvider {
     static var previews: some View {
-        CryptoSummaryItemCell(cryptoItem: Coin(id: "0", image: UIImage(), name: "Bitcoin", symbol: "BTC", value: 10))
+        CryptoSummaryItemCell(cryptoItem: Coin(id: "0", image: UIImage(), name: "Bitcoin", symbol: "BTC", value: 10, vol24: 12))
     }
 }

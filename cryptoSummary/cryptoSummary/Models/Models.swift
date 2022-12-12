@@ -47,10 +47,32 @@ struct CoinValueResponse: Codable {
     }
 }
 
+struct CoinMarketDataResponse: Codable {
+    let raw: [String: [String: CoinMarketDataSymbol]]?
+    
+    enum CodingKeys: String, CodingKey {
+        case raw = "RAW"
+    }
+}
+
+struct CoinMarketDataSymbol: Codable {
+    let volume24HourTo: Float?
+    
+    enum CodingKeys: String, CodingKey {
+        case volume24HourTo = "VOLUME24HOURTO"
+    }
+}
+
+struct Coin24HourlVolume {
+    let id: String
+    let volume24Hour: Float
+}
+
 struct Coin: Identifiable, Equatable {
     let id: String
     let image: UIImage
     let name: String
     let symbol: String
     let value: Float
+    let vol24: Float
 }

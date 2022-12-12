@@ -27,6 +27,6 @@ struct CoinAmountEurDetailView: View {
 
 struct CoinAmountEurDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        CoinAmountEurDetailView(viewModel: CryptoSummaryDetailViewModel(coin: Coin(id: "12", image: UIImage(), name: "BTC", symbol: "BTC", value: 0.0)))
+        CoinAmountEurDetailView(viewModel: CryptoSummaryDetailViewModel(coin: Coin(id: "12", image: UIImage(), name: "BTC", symbol: "BTC", value: 0.0, vol24: 0.0)))
     }
 }

@@ -13,6 +13,7 @@ protocol CryptoSummaryDataManagerProtocol {
     func getCoins(from: Int, to: Int) -> AnyPublisher<[CoinResponse], Error>
     func imagesPublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinImage, any Error>>>.Output>
     func coinEurValuePublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<CoinValue, any Error>>>.Output>
+    func coin24HourVolumePublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<Coin24HourlVolume, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<Coin24HourlVolume, any Error>>>.Output>
     func saveCoinsToCoreData(coins: [Coin])
     func loadCoinsFromCoreData() -> [Coin]?
 }
@@ -80,6 +81,17 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
                 return $0.1
             }
     }
+
+    func coin24HourVolumePublisher(coinsPublisher: AnyPublisher<[CoinResponse], Error>) -> Publishers.Map<Publishers.FlatMap<Publishers.Zip<Result<[CoinResponse], any Error>.Publisher, Publishers.Collect<Publishers.MergeMany<AnyPublisher<Coin24HourlVolume, any Error>>>>, AnyPublisher<[CoinResponse], any Error>>, Publishers.Collect<Publishers.MergeMany<AnyPublisher<Coin24HourlVolume, any Error>>>.Output> {
+        return coinsPublisher
+            .flatMap { coins in
+                return Publishers.Zip(Just(coins).setFailureType(to: Error.self),
+                                      Publishers.MergeMany(coins.map { self.getCoin24HourVolume(for: $0) }).collect())
+            }
+            .map {
+                return $0.1
+            }
+    }
     
     func saveCoinsToCoreData(coins: [Coin]) {
         clearCoreDataCoinsEntity()
@@ -91,6 +103,7 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
                 coinData.setValue(coin.symbol, forKeyPath: "symbol")
                 coinData.setValue(coin.image.pngData(), forKeyPath: "image")
                 coinData.setValue(coin.value, forKeyPath: "value")
+                coinData.setValue(coin.vol24, forKeyPath: "vol24")
             }
         }
         
@@ -113,7 +126,8 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
                 let name = $0.value(forKey: "name") as? String ?? ""
                 let symbol = $0.value(forKey: "symbol") as? String ?? ""
                 let value = $0.value(forKey: "value") as? Float ?? 0
-                return Coin(id: id, image: image, name: name, symbol: symbol, value: value)
+                let vol24 = $0.value(forKey: "vol24") as? Float ?? 0
+                return Coin(id: id, image: image, name: name, symbol: symbol, value: value, vol24: vol24)
             }
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
@@ -140,6 +154,21 @@ private extension CryptoSummaryDataManager {
             .map(\.data)
             .decode(type: CoinValueResponse.self, decoder: JSONDecoder())
             .compactMap { CoinValue(id: coin.id, eur: $0.eur ?? 0.0)}
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+    }
+    
+    func getCoin24HourVolume(for coin: CoinResponse) -> AnyPublisher<Coin24HourlVolume, Error> {
+        let fiatCoin = "EUR"
+        let urlCoinVol = URL(string: "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=\(coin.symbol)&tsyms=\(fiatCoin)")!
+        return URLSession.shared.dataTaskPublisher(for: urlCoinVol)
+            .map(\.data)
+            .decode(type: CoinMarketDataResponse.self, decoder: JSONDecoder())
+            .compactMap {
+                let dict = $0.raw?.values.map { $0 }
+                guard let value = dict?.first?[fiatCoin]?.volume24HourTo else { return Coin24HourlVolume(id: coin.id, volume24Hour: 0.0) }
+                return Coin24HourlVolume(id: coin.id, volume24Hour: value)
+            }
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
