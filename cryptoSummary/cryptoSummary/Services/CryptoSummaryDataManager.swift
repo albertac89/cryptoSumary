@@ -19,6 +19,8 @@ protocol CryptoSummaryDataManagerProtocol {
 }
 
 class CryptoSummaryDataManager {
+    var client = URLSession.shared
+    
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "cryptoSummary")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
@@ -28,6 +30,10 @@ class CryptoSummaryDataManager {
         })
         return container
     }()
+    
+    init() {
+        setMockData()
+    }
 }
 
 extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
@@ -35,7 +41,7 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
         guard let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/all/coinlist") else {
             return Fail(error: APIError.invalidUrl).eraseToAnyPublisher()
         }
-        return URLSession.shared.dataTaskPublisher(for: urlCoinList)
+        return client.dataTaskPublisher(for: urlCoinList)
             .tryMap { (data: Data, response: URLResponse) in
                 try self.handleErrors(data: data, response: response)
                 return data
@@ -119,11 +125,27 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
 }
 
 private extension CryptoSummaryDataManager {
+    func setMockData() {
+        URLProtocol.registerClass(MockURLProtocol.self)
+        let configurationWithMock = URLSessionConfiguration.default
+        configurationWithMock.protocolClasses = [MockURLProtocol.self]
+        client = URLSession(configuration: configurationWithMock)
+        
+        guard let coinsListMock = MockedData.forFile(name: "coinsList"),
+              let imageMock = MockedData.forFile(name: "media", fileExtension: "jpg"),
+              let coinPriceMock = MockedData.forFile(name: "coinPrice"),
+              let priceMultiFullMock = MockedData.forFile(name: "priceMultiFull") else { return }
+        MockURLProtocol.mockData["/data/all/coinlist"] = coinsListMock
+        MockURLProtocol.mockData["/media"] = imageMock
+        MockURLProtocol.mockData["/data/price"] = coinPriceMock
+        MockURLProtocol.mockData["/data/pricemultifull"] = priceMultiFullMock
+    }
+    
     func getCoinImage(for coin: CoinResponse) -> AnyPublisher<CoinImage, Error> {
         guard let url = URL(string: "https://www.cryptocompare.com\(coin.imageUrl ?? "")") else {
             return Fail(error: APIError.invalidUrl).eraseToAnyPublisher()
         }
-        return URLSession.shared.dataTaskPublisher(for: url)
+        return client.dataTaskPublisher(for: url)
             .tryMap { (data: Data, response: URLResponse) in
                 try self.handleErrors(data: data, response: response)
                 return data
@@ -138,7 +160,7 @@ private extension CryptoSummaryDataManager {
         guard let urlCoinList = URL(string: "https://min-api.cryptocompare.com/data/price?fsym=\(coin.symbol)&tsyms=EUR") else {
             return Fail(error: APIError.invalidUrl).eraseToAnyPublisher()
         }
-        return URLSession.shared.dataTaskPublisher(for: urlCoinList)
+        return client.dataTaskPublisher(for: urlCoinList)
             .map(\.data)
             .decode(type: CoinValueResponse.self, decoder: JSONDecoder())
             .compactMap { CoinValue(id: coin.id, eur: $0.eur ?? 0.0)}
@@ -150,7 +172,7 @@ private extension CryptoSummaryDataManager {
         guard let urlCoinVol = URL(string: "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=\(coin.symbol)&tsyms=\(fiatCoinVol)") else {
             return Fail(error: APIError.invalidUrl).eraseToAnyPublisher()
         }
-        return URLSession.shared.dataTaskPublisher(for: urlCoinVol)
+        return client.dataTaskPublisher(for: urlCoinVol)
             .map(\.data)
             .decode(type: CoinMarketDataResponse.self, decoder: JSONDecoder())
             .compactMap {
