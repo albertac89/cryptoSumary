@@ -32,7 +32,7 @@ class CryptoSummaryDataManager {
     }()
     
     init() {
-        setMockData()
+        setMockDataIfNeeded()
     }
 }
 
@@ -125,7 +125,8 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
 }
 
 private extension CryptoSummaryDataManager {
-    func setMockData() {
+    func setMockDataIfNeeded() {
+        #if TESTING
         URLProtocol.registerClass(MockURLProtocol.self)
         let configurationWithMock = URLSessionConfiguration.default
         configurationWithMock.protocolClasses = [MockURLProtocol.self]
@@ -139,6 +140,7 @@ private extension CryptoSummaryDataManager {
         MockURLProtocol.mockData["/media"] = imageMock
         MockURLProtocol.mockData["/data/price"] = coinPriceMock
         MockURLProtocol.mockData["/data/pricemultifull"] = priceMultiFullMock
+        #endif
     }
     
     func getCoinImage(for coin: CoinResponse) -> AnyPublisher<CoinImage, Error> {
