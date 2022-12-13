@@ -85,3 +85,30 @@ struct Coin: Identifiable, Equatable {
         self.vol24 = vol24 == .zero ? "No data available" : "\(vol24)€"
     }
 }
+
+enum APIError: LocalizedError {
+    case invalidUrl
+    case invalidResponse
+    case genericError(String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidUrl:
+            return "Invalid URL"
+        case .invalidResponse:
+            return "Invalid response"
+        case .genericError(let message):
+            return message
+        }
+    }
+}
+
+struct APIErrorMessage: Codable {
+    let response: String
+    let message: String
+    
+    enum CodingKeys: String, CodingKey {
+        case response = "Response"
+        case message = "Message"
+    }
+}

@@ -43,7 +43,13 @@ struct CryptoSummaryListView: View {
                     LoaderView(scale: 1)
                 }
             }
-        }.onAppear(perform: viewModel.fetchCoins)
+        }
+        .onAppear(perform: viewModel.fetchCoins)
+        .alert("Error:", isPresented: $viewModel.showError, actions: {
+            Button("Ok", role: .cancel) { }
+        }, message: {
+            Text(viewModel.errorMessage)
+        })
     }
 }
 

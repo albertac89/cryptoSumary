@@ -16,6 +16,8 @@ class CryptoSummaryListViewModel: ObservableObject {
     @Published var coinsList = [Coin]()
     @Published var isLoading = false
     @Published var isLoadingEndScroll = false
+    @Published var showError = false
+    @Published var errorMessage = ""
     
     private var subscribers = Set<AnyCancellable>()
     private var dataManager: CryptoSummaryDataManagerProtocol
@@ -54,11 +56,15 @@ extension CryptoSummaryListViewModel: CryptoSummaryListViewModelProtocol {
             .sink { completion in
                 switch completion {
                 case .failure(let error):
-                    print("Failed with error: \(error)")
-                    return
+                    print(error.localizedDescription)
+                    self.errorMessage = error.localizedDescription
+                    self.showError = true
+                    self.isLoading = false
+                    self.isLoadingEndScroll = false
                 case .finished:
                     print("Succeesfully finished!")
                 }
+                return
             } receiveValue: { coinsResponse, imagesResponse, coinValuesResponse, coin24HourVolume in
                 self.dataManager.mergeCoinsData(coinsList: &self.coinsList, coinsResponse: coinsResponse, imagesResponse: imagesResponse, coinValuesResponse: coinValuesResponse, coin24HourVolume: coin24HourVolume)
                 self.isLoading = false
