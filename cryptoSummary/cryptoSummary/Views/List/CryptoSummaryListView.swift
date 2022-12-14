@@ -55,6 +55,6 @@ struct CryptoSummaryListView: View {
 
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
-        CryptoSummaryListView(viewModel: CryptoSummaryListViewModel(dataManager: CryptoSummaryDataManager(), networkMonitor: NetworkMonitor()))
+        CryptoSummaryListView(viewModel: CryptoSummaryListViewModel(dataManager: CryptoSummaryDataManager(client: URLSession.shared), networkMonitor: NetworkMonitor()))
     }
 }

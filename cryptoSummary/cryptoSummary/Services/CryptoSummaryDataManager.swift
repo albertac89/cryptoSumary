@@ -19,7 +19,7 @@ protocol CryptoSummaryDataManagerProtocol {
 }
 
 class CryptoSummaryDataManager {
-    var client = URLSession.shared
+    var client: URLSession
     
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "cryptoSummary")
@@ -31,8 +31,8 @@ class CryptoSummaryDataManager {
         return container
     }()
     
-    init() {
-        setMockDataIfNeeded()
+    init(client: URLSession) {
+        self.client = client
     }
 }
 
@@ -125,24 +125,6 @@ extension CryptoSummaryDataManager: CryptoSummaryDataManagerProtocol {
 }
 
 private extension CryptoSummaryDataManager {
-    func setMockDataIfNeeded() {
-        #if TESTING
-        URLProtocol.registerClass(MockURLProtocol.self)
-        let configurationWithMock = URLSessionConfiguration.default
-        configurationWithMock.protocolClasses = [MockURLProtocol.self]
-        client = URLSession(configuration: configurationWithMock)
-        
-        guard let coinsListMock = MockedData.forFile(name: "coinsList"),
-              let imageMock = MockedData.forFile(name: "media", fileExtension: "jpg"),
-              let coinPriceMock = MockedData.forFile(name: "coinPrice"),
-              let priceMultiFullMock = MockedData.forFile(name: "priceMultiFull") else { return }
-        MockURLProtocol.mockData["/data/all/coinlist"] = coinsListMock
-        MockURLProtocol.mockData["/media"] = imageMock
-        MockURLProtocol.mockData["/data/price"] = coinPriceMock
-        MockURLProtocol.mockData["/data/pricemultifull"] = priceMultiFullMock
-        #endif
-    }
-    
     func getCoinImage(for coin: CoinResponse) -> AnyPublisher<CoinImage, Error> {
         guard let url = URL(string: "https://www.cryptocompare.com\(coin.imageUrl ?? "")") else {
             return Fail(error: APIError.invalidUrl).eraseToAnyPublisher()
